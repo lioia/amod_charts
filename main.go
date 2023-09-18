@@ -38,6 +38,13 @@ func main() {
 	generateStats(sol2, "time_indexed")
 	generateStats(sol3, "heuristics_precedence")
 	generateStats(sol4, "heuristics_positional")
+	equal := 0
+	for i := 0; i < len(sol0); i++ {
+		if sol0[i].Status == 9 && sol0[i].Solution == sol1[i].Solution {
+			equal += 1
+		}
+	}
+	fmt.Printf("Precedence (timed out) Solution Equal: %d\n", equal)
 }
 
 func generateStats(sol []Solution, name string) {
@@ -122,6 +129,17 @@ func generateSolDifference(sol3 []Solution) {
 	if err := line.Render(f); err != nil {
 		log.Fatal(err)
 	}
+	difference := 0.0
+	equal := 0
+	for i := 0; i < len(sol3); i++ {
+		difference += (sol3[i].Heuristic) - sol3[i].Solution
+		if sol3[i].Heuristic == sol3[i].Solution {
+			equal += 1
+		}
+	}
+	difference /= float64(len(sol3))
+	fmt.Printf("Heuristics Mean Difference: %.2f\n", difference)
+	fmt.Printf("Heuristics Equal Solution: %d\n", equal)
 }
 
 func generateRuntimeDifference(sol_no_heur, sol_heur []Solution, name string) {
