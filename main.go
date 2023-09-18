@@ -26,13 +26,27 @@ func main() {
 	sol2 := readCsv("assets/solution-2.csv")
 	sol3 := readCsv("assets/solution-3.csv")
 	sol4 := readCsv("assets/solution-4.csv")
-	os.Mkdir("output", 0700)
+	_ = os.Mkdir("output", 0700)
 	generateTimedOutCharts(sol0)
 	generateRuntime(sol0, sol1, sol2)
 	generateRuntimeDifference(sol0, sol3, "Precedence")
-	generateRuntimeDifference(sol2, sol4, "Positional")
+	generateRuntimeDifference(sol1, sol4, "Positional")
 	generateSolDifference(sol4)
 	generateSolDifferenceTimedOut(sol0, sol1)
+	generateStats(sol0, "precedence")
+	generateStats(sol1, "positional")
+	generateStats(sol2, "time_indexed")
+	generateStats(sol3, "heuristics_precedence")
+	generateStats(sol4, "heuristics_positional")
+}
+
+func generateStats(sol []Solution, name string) {
+	meanRuntime := 0.0
+	for _, v := range sol {
+		meanRuntime += v.Runtime
+	}
+	meanRuntime /= float64(len(sol))
+	fmt.Printf("Mean runtime for %s: %.2f\n", name, meanRuntime)
 }
 
 func generateSolDifferenceTimedOut(sol0 []Solution, sol1 []Solution) {
@@ -69,7 +83,9 @@ func generateSolDifferenceTimedOut(sol0 []Solution, sol1 []Solution) {
 		AddSeries("Timed Out Solution", data0).
 		AddSeries("Real Solution", data1)
 	f, _ := os.Create("output/precedence_sol_difference.html")
-	line.Render(f)
+	if err := line.Render(f); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func generateSolDifference(sol3 []Solution) {
@@ -103,7 +119,9 @@ func generateSolDifference(sol3 []Solution) {
 		AddSeries("No Heuristsics Solution", data0).
 		AddSeries("Heuristics Solution", data1)
 	f, _ := os.Create("output/sol_difference.html")
-	line.Render(f)
+	if err := line.Render(f); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func generateRuntimeDifference(sol_no_heur, sol_heur []Solution, name string) {
@@ -137,7 +155,9 @@ func generateRuntimeDifference(sol_no_heur, sol_heur []Solution, name string) {
 		AddSeries("No Heuristics Runtime", data0).
 		AddSeries("Heuristics Runtime", data1)
 	f, _ := os.Create(fmt.Sprintf("output/run_difference_%s.html", name))
-	line.Render(f)
+	if err := line.Render(f); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func generateRuntime(sol0, sol1, sol2 []Solution) {
@@ -173,7 +193,9 @@ func generateRuntime(sol0, sol1, sol2 []Solution) {
 		AddSeries("Positional Model", data1).
 		AddSeries("Time-Indexed Model", data2)
 	f, _ := os.Create("output/run.html")
-	line.Render(f)
+	if err := line.Render(f); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func generateTimedOutCharts(sol []Solution) {
@@ -204,7 +226,12 @@ func generateTimedOutCharts(sol []Solution) {
 		AddSeries("Completed", []opts.BarData{{Value: completed}}).
 		AddSeries("Timed Out", []opts.BarData{{Value: len(sol) - completed}})
 	f, _ := os.Create("output/timed.html")
-	bar.Render(f)
+	if err := bar.Render(f); err != nil {
+		log.Fatal(err)
+	}
+	percentCompleted := float64(completed) / float64(len(sol)) * 100
+	fmt.Printf("Completed: %d (%.2f); Timed Out: %d (%.2f)\n",
+		completed, percentCompleted, len(sol)-completed, 100-percentCompleted)
 }
 
 func readCsv(file string) []Solution {
