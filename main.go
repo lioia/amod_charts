@@ -26,11 +26,13 @@ func main() {
 	sol2 := readCsv("assets/solution-2.csv")
 	sol3 := readCsv("assets/solution-3.csv")
 	sol4 := readCsv("assets/solution-4.csv")
+	sol5 := readCsv("assets/solution-5.csv")
 	_ = os.Mkdir("output", 0700)
 	generateTimedOutCharts(sol0)
 	generateRuntime(sol0, sol1, sol2)
 	generateRuntimeDifference(sol0, sol3, "Precedence")
 	generateRuntimeDifference(sol1, sol4, "Positional")
+	generateRuntimeDifference(sol2, sol5, "Time Indexed")
 	generateSolDifference(sol4)
 	generateSolDifferenceTimedOut(sol0, sol1)
 	generateStats(sol0, "precedence")
@@ -38,6 +40,7 @@ func main() {
 	generateStats(sol2, "time_indexed")
 	generateStats(sol3, "heuristics_precedence")
 	generateStats(sol4, "heuristics_positional")
+	generateStats(sol5, "heuristics_time_indexed")
 	equal := 0
 	for i := 0; i < len(sol0); i++ {
 		if sol0[i].Status == 9 && sol0[i].Solution == sol1[i].Solution {
